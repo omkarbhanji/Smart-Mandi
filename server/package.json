@@ -1,0 +1,27 @@
+{
+  "name": "smart-mandi",
+  "version": "1.0.0",
+  "description": "This project provides an end to end solution to the farmers for selling their vegetables at their nearest market with absolute ease. Machine learning is used to provide insights to the farmer, helping the farmer make a right choice. Inventory management and time to time notifications before any incurring any loss to the farmer.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omkarbhanji/Smart-Mandi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omkarbhanji/Smart-Mandi/issues"
+  },
+  "homepage": "https://github.com/omkarbhanji/Smart-Mandi#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.3"
+  }
+}
