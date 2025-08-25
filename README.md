@@ -25,11 +25,11 @@ Project Routes:
 
 Database schema 
 
-Table name: farmers
-schema:
+Table name: farmers <br>
+schema: <br>
 farmer_id |     name     |          email           |         password          |     phone      |    location    |    state    |         created_at         |         updated_at         | latitude  | longitude
 
-Table name: inventory
-schema:
+Table name: inventory <br>
+schema: <br>
 
  inventory_id | farmer_id | crop_name | quantity | unit | harvest_date | expiry_date | remaining_quantity |  status   |         created_at         |         updated_at
