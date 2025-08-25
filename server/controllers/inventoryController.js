@@ -17,7 +17,7 @@ exports.addNewCrop = async (req, res) => {
         tomatoes : 7,
         onions: 28,
         potatoes: 28
-    }; //all in days 
+    }; //all in days -> to be added to harverstDate 
 
     try{
         const remainingQuantity = quantity;

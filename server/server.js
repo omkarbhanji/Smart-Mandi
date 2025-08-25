@@ -15,8 +15,8 @@ app.get('/', (req, res) => {
   res.send('Server is working!');
 });
 
-app.use('/api/users', userRoutes);
-app.use('/api', inventoryRoutes);
+app.use('/api/users', userRoutes);  
+app.use('/api', inventoryRoutes);  
 
 const PORT = 5000;
 

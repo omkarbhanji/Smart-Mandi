@@ -1,6 +1,10 @@
 const express = require('express');
 const pool = require('../db');
 
+
+//json remaining
+
+
 exports.registerUser = async(req, res) => {
     const name = req.body.name;
     const email = req.body.email;
