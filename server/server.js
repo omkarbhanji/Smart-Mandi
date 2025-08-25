@@ -8,12 +8,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const userRoutes = require('./routes/userRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
+
 app.get('/', (req, res) => {
   res.send('Server is working!');
 });
 
+app.use('/api/users', userRoutes);
+app.use('/api', inventoryRoutes);
 
 const PORT = 5000;
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

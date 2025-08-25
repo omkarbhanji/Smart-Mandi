@@ -11,3 +11,25 @@ Basic structure of the project:
 
 3. Frontend
 4. ML model -> customized loss function to handle outliners and prediction with confidence level using gaussian/bell curve for probability distribution.
+
+--------------------------------------------------------------------------------------
+Project Routes:
+
+1. http://localhost:5000/api/inventory - GET (All inventory records for the farmer who has logged in).
+2. http://localhost:5000/api/inventory - POST (Add anu new crop to inventory)
+
+3. http://localhost:5000/api/users/register - POST (Register new farmer)
+4. http://localhost:5000/api/users/login - POST (login)
+
+--------------------------------------------------------------------------------------
+
+Database schema 
+
+Table name: farmers
+schema:
+farmer_id |     name     |          email           |         password          |     phone      |    location    |    state    |         created_at         |         updated_at         | latitude  | longitude
+
+Table name: inventory
+schema:
+
+ inventory_id | farmer_id | crop_name | quantity | unit | harvest_date | expiry_date | remaining_quantity |  status   |         created_at         |         updated_at

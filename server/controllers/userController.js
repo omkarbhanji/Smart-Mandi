@@ -29,7 +29,7 @@ exports.loginUser = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     try{
-        const response = await pool.query(`select * from users where email = $1`, [email]);
+        const response = await pool.query(`select * from farmers where email = $1`, [email]);
         if(response.rowCount === 0){
         res.status(400).json({message: 'user not found !'});
       }
