@@ -16,7 +16,7 @@ Basic structure of the project:
 Project Routes:
 
 1. http://localhost:5000/api/inventory - GET (All inventory records for the farmer who has logged in).
-2. http://localhost:5000/api/inventory - POST (Add anu new crop to inventory)
+2. http://localhost:5000/api/inventory - POST (Add any new crop to inventory)
 
 3. http://localhost:5000/api/users/register - POST (Register new farmer)
 4. http://localhost:5000/api/users/login - POST (login)
