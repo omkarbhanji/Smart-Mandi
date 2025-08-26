@@ -45,3 +45,39 @@ exports.getAllInventory = async(req, res) => {
         res.status(500).json({message: err.message});
     }
 };
+
+exports.getById = async(req, res) => {
+    const inventoryId = req.params.inventoryId;
+
+    try{
+        const response = await pool.query(`select * from inventory where inventory_id = $1`, [inventoryId]);
+        if(response.wors.length === 0){
+            return res.status(404).json({ message: "Task not found" });
+        }
+        return res.status(201).json({response});
+    }catch(err){
+        return res.status(500).json({error: err.message});
+    }
+};
+
+exports.deleteItemFromInventory = async (req, res) => {
+    const inventoryId = req.params.inventoryId;
+    try{
+        const response = await pool.query(
+      `DELETE FROM inventory WHERE id = $1 RETURNING *`,
+      [inventoryId]
+    );
+
+    if (response.rows.length === 0) {
+      return res.status(404).json({ message: "Item not found in inventory" });
+    }
+
+    return res.status(200).json({
+      message: "Item deleted from inventory successfully",
+      deletedItem: response.rows[0]
+    });
+
+    }catch(err){
+        return res.status(500).json({ error: err.message });
+    }
+};
