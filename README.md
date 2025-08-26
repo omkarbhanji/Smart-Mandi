@@ -21,6 +21,8 @@ Project Routes:
 3. http://localhost:5000/api/users/register - POST (Register new farmer)
 4. http://localhost:5000/api/users/login - POST (login)
 
+5. http://localhost:5000/api/inventory/:inventory_id/sales - POST (new sales record and update inventory) 
+
 --------------------------------------------------------------------------------------
 
 Database schema 
