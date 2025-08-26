@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);  
-app.use('/api', inventoryRoutes);  
+app.use('/api/inventory', inventoryRoutes);  
 
 const PORT = 5000;
 
