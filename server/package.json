@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "This project provides an end to end solution to the farmers for selling their vegetables at their nearest market with absolute ease. Machine learning is used to provide insights to the farmer, helping the farmer make a right choice. Inventory management and time to time notifications before any incurring any loss to the farmer.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
@@ -19,9 +20,11 @@
   "homepage": "https://github.com/omkarbhanji/Smart-Mandi#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
+    "dotenv": "^16.1.4",
     "express": "^5.1.0",
     "nodemon": "^3.1.10",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7"
   }
 }
