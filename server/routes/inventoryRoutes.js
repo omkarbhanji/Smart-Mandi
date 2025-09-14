@@ -1,8 +1,14 @@
-const express = require('express');
+// const express = require('express');
+// const router = express.Router();
+
+import express from "express";
 const router = express.Router();
 
-const {addNewCrop, getAllInventory} = require('../controllers/inventoryController');
-const { addNewSales } = require('../controllers/salesController');
+// const {addNewCrop, getAllInventory} = require('../controllers/inventoryController');
+// const { addNewSales } = require('../controllers/salesController');
+
+import {addNewCrop, getAllInventory} from "../controllers/inventoryController.js";
+import {addNewSales} from "../controllers/salesController.js";
 
 // inventory routes
 router.get('/', getAllInventory); 
@@ -11,4 +17,4 @@ router.post('/', addNewCrop);
 //sales routes
 router.post('/:id/sales', addNewSales);
 
-module.exports = router;
+export default router;
