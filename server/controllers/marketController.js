@@ -1,95 +1,71 @@
-const express = require('express');
-const pool = require('../db');
+// const { Market } = require("../model/index");
+// const { predictPrice, predictDistribution } = require("../services");
+
+import {Market} from "../model/index";
+import {predictPrice, predictDistribution} from "../services";
 
 exports.nearByPrices = async (req, res) => {
- 
+  try {
+    const { item, variety = null, grade = null, state, district, priceDate } = req.query;
 
-//     {
-//   "state": "Kerala",
-//   "district": "Kottayam",
-//   "market_name": "Thalayolaparambu",
-//   "commodity": "Onion",
-//   "variety": "Big",
-//   "grade": "FAQ",
-//   "price_date": "2025-09-01"
-// }
+    if (!item || !district || !state) {
+      return res
+        .status(400)
+        .json({ message: "item name, district or state missing" });
+    }
 
-// GET /markets/nearby-prices?lat=..&lon=..&radius=..&commodity=Onion&variety=Big&grade=FAQ
+    // 1. find nearby markets
+    const markets = await Market.findAll({
+      where: { district, state },
+      raw: true,
+    });
 
-//     /predict/price
-//     /predict/distribution
-
-//    STATE	 District Name	Market Name	Commodity	Variety	Grade	Min_Price	Max_Price	Modal_Price	Price Date
-
-
-try{
-      const {item, variety = null, grade = null, state, district, price_date} = req.query;
-
-      if(!item || !district || !state){
-        return res.status(400).json({message: "item name, district or state missing"});
-      }
-
-    //   1.  finding nearby markets -> i.e. markets in the city
-
-    const {rows: markets} = await pool.query(
-        `select name from markets where district= $1 and state = $2;`, [district, state]
-    );
-
-    // 2. for each market, calling the ML model
-
+    // 2. for each market, call ML model
     const tasks = markets.map(async (m) => {
-        const payload = {
-            state: state || m.state,
-            district: district || m.district,
-            market_name: m.market_name,
-            item,
-            variety,
-            grade,
-            price_date
-        };
+      const payload = {
+        state: m.state,
+        district: m.district,
+        marketName: m.name,
+        item,
+        variety,
+        grade,
+        priceDate,
+      };
 
-        try{
+      try {
         const [pt, dist] = await Promise.all([
           predictPrice(payload),
-          predictDistribution(payload)
+          predictDistribution(payload),
         ]);
 
         return {
-            market_id: m.market_id,
-          market_name: m.name,
+          marketId: m.marketId,
+          marketName: m.name,
           state: m.state,
           district: m.district,
-          distance_km: Number(m.distance_km.toFixed(2)),
-          predicted_price: pt.predicted_price,
-          distribution: dist
+          // distance_km depends on how you're computing distance (not in your schema)
+          predictedPrice: pt.predictedPrice,
+          distribution: dist,
         };
-        }
-        catch(err){
+      } catch (err) {
         return {
-          market_id: m.market_id,
-          market_name: m.name,
+          marketId: m.marketId,
+          marketName: m.name,
           state: m.state,
           district: m.district,
-          distance_km: Number(m.distance_km.toFixed(2)),
-          error: "ML service unavailable"
+          error: "ML service unavailable",
         };
-        }
+      }
     });
 
     const results = await Promise.all(tasks);
+
     return res.json({
-        item, 
-        count: results.length,
-        markets: results
+      item,
+      count: results.length,
+      markets: results,
     });
-
-
-}catch(err){
+  } catch (err) {
     return res.status(500).json({ error: err.message });
-}
-
-
-
-   
-
+  }
 };
