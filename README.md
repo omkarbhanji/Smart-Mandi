@@ -28,7 +28,11 @@ Project Routes:
 .env file example
 ```
 PORT=3001
+
 DATABASE_URL = postgresql://<username>:<password>@localhost:5432/<database-name>
+
+JWT_SECRET_KEY=your_jwt_secret_key
+JWT_EXPIRES_IN=7d
 
 ```
 --------------------------------------------------------------------------------------
