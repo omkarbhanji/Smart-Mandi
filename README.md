@@ -25,6 +25,14 @@ Project Routes:
 
 --------------------------------------------------------------------------------------
 
+.env file example
+```
+PORT=3001
+DATABASE_URL = postgresql://<username>:<password>@localhost:5432/<database-name>
+
+```
+--------------------------------------------------------------------------------------
+
 Database schema 
 
 Table name: farmers <br>
