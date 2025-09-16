@@ -1,11 +1,17 @@
-// const express = require('express');
 import express from "express";
+import { protect } from "../controllers/authController.js";
+import {
+  registerUser,
+  loginUser,
+  getFarmers,
+  getFarmer,
+} from "../controllers/userController.js";
+
 const router = express.Router();
 
-// const {registerUser, loginUser} = require('../controllers/userController');
-import {registerUser, loginUser} from "../controllers/userController.js";
-
-router.post('/register', registerUser);  
-router.post('/login', loginUser);  
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/", protect, getFarmers);
+router.get("/:farmerId", getFarmer);
 
 export default router;
