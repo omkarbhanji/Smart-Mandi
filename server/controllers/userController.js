@@ -20,12 +20,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     longitude,
   });
 
-  // return res.status(201).json({
-  //   status: "success",
-  //   data: {
-  //     farmer,
-  //   },
-  // });
   sendToken(farmer, 201, res);
 });
 

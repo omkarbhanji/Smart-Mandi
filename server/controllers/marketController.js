@@ -1,21 +1,68 @@
 import { Market } from "../model/index.js";
-import { predictPrice, predictDistribution } from "../services";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { AppError } from "../utils/appError.js";
+import axios from "axios";
 
-exports.nearByPrices = asyncHandler(async (req, res, next) => {
-  const {
-    item,
-    variety = null,
-    grade = null,
-    state,
-    district,
-    priceDate,
-  } = req.query;
+// export const nearByPrices = asyncHandler(async (req, res, next) => {
+//   const { state, district, crop, variety, grade, priceDate } = req.body;
 
-  if (!item || !district || !state) {
-    return next(new AppError("Item name, district or state missing", 400));
+//   if (!crop || !district || !state) {
+//     return next(new AppError("Please enter all required fields", 400));
+//   }
+
+//   // 1. find nearby markets
+//   const markets = await Market.findAll({
+//     where: { district, state },
+//     raw: true,
+//   });
+
+//   const queries = markets.map((m) => ({
+//     state: m.state,
+//     district: m.district,
+//     market: m.name,
+//     crop,
+//     variety,
+//     grade,
+//     priceDate,
+//   }));
+
+//   const tasks = queries.map(async (q) => {
+//     try {
+//       const response = await axios.post("http://127.0.0.1:5000/predict", q);
+//       return {
+//         market: q.market,
+//         predictedPrice: response.data.predicted_price,
+//       };
+//     } catch (err) {
+//       return {
+//         market: q.market,
+//         error: "ML service unavailable",
+//       };
+//     }
+//   });
+
+//   const results = await Promise.all(tasks);
+
+//   res.status(200).json({
+//     status: "success",
+//     crop,
+//     count: results.length,
+//     markets: results,
+//   });
+// });
+
+export const nearByPrices = asyncHandler(async (req, res, next) => {
+  const { state, district, crop, variety, grade, priceDate } = req.body;
+
+  if (!crop || !district || !state || !priceDate) {
+    return next(new AppError("Please enter all required fields", 400));
   }
+
+  // Convert priceDate to day, month, year
+  const dateObj = new Date(priceDate); // e.g., "2025-09-24"
+  const day = dateObj.getDate();
+  const month = dateObj.getMonth() + 1; // months are 0-based
+  const year = dateObj.getFullYear();
 
   // 1. find nearby markets
   const markets = await Market.findAll({
@@ -23,39 +70,28 @@ exports.nearByPrices = asyncHandler(async (req, res, next) => {
     raw: true,
   });
 
-  // 2. for each market, call ML model
-  const tasks = markets.map(async (m) => {
-    const payload = {
-      state: m.state,
-      district: m.district,
-      marketName: m.name,
-      item,
-      variety,
-      grade,
-      priceDate,
-    };
+  const queries = markets.map((m) => ({
+    state: m.state,
+    district: m.district,
+    market: m.name,
+    crop,
+    variety,
+    grade,
+    day,
+    month,
+    year,
+  }));
 
+  const tasks = queries.map(async (q) => {
     try {
-      const [pt, dist] = await Promise.all([
-        predictPrice(payload),
-        predictDistribution(payload),
-      ]);
-
+      const response = await axios.post("http://127.0.0.1:5000/predict", q);
       return {
-        marketId: m.marketId,
-        marketName: m.name,
-        state: m.state,
-        district: m.district,
-        // distance_km depends on how you're computing distance (not in your schema)
-        predictedPrice: pt.predictedPrice,
-        distribution: dist,
+        market: q.market,
+        predictedPrice: response.data.predicted_price,
       };
     } catch (err) {
       return {
-        marketId: m.marketId,
-        marketName: m.name,
-        state: m.state,
-        district: m.district,
+        market: q.market,
         error: "ML service unavailable",
       };
     }
@@ -63,8 +99,9 @@ exports.nearByPrices = asyncHandler(async (req, res, next) => {
 
   const results = await Promise.all(tasks);
 
-  return res.json({
-    item,
+  res.status(200).json({
+    status: "success",
+    crop,
     count: results.length,
     markets: results,
   });

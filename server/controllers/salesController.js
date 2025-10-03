@@ -67,6 +67,7 @@ export const addNewSales = asyncHandler(async (req, res, next) => {
   await transaction.commit();
 
   return res.status(201).json({
+    status: "success",
     message: "Sale recorded successfully",
     sale: newSale,
     updatedInventory: inventory,

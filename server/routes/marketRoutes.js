@@ -1,11 +1,8 @@
-// const express = require('express');
 import express from "express";
+import { nearByPrices } from "../controllers/marketController.js";
+
 const router = express.Router();
 
-// const {nearByPrices} = require('../controllers/marketController');
-import {nearByPrices} from "../controllers/inventoryController";
+router.get("/predict-price", nearByPrices);
 
-router.get('/nearby-prices', nearByPrices);
-
-module.exports = router;
-
+export default router;

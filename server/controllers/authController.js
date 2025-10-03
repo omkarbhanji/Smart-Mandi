@@ -26,3 +26,22 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+export const authUser = asyncHandler(async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return next(new AppError("Authentication failed", 401));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await Farmer.findByPk(decoded.id);
+    return res.status(200).json({
+      status: "success",
+      authenticated: true,
+      user: user,
+    });
+  } catch (error) {
+    return res.status(401).json({ status: "fail", authenticated: false });
+  }
+});

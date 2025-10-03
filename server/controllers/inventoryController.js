@@ -37,6 +37,7 @@ export const addNewCrop = asyncHandler(async (req, res, next) => {
   });
 
   res.status(201).json({
+    status: "success",
     message: "Record added in inventory successfully",
   });
 });
@@ -49,6 +50,7 @@ export const getAllInventory = asyncHandler(async (req, res, next) => {
   });
 
   res.status(200).json({
+    status: "success",
     inventories,
   });
 });
@@ -63,6 +65,7 @@ export const getById = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({
+    status: "success",
     inventory,
   });
 });
@@ -78,8 +81,9 @@ export const deleteItemFromInventory = asyncHandler(async (req, res, next) => {
 
   await inventory.destroy();
 
-  return res.status(200).json({
+  return res.status(204).json({
+    status: "success",
     message: "Item deleted from inventory successfully",
-    deletedItem: inventory,
+    data: null,
   });
 });
