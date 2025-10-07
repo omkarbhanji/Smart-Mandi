@@ -1,11 +1,11 @@
-import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
+import { DataTypes } from "sequelize";
 import bcrypt from "bcrypt";
 
-const Farmer = sequelize.define(
-  "Farmer",
+const User = sequelize.define(
+  "User",
   {
-    farmerId: {
+    userId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -55,33 +55,13 @@ const Farmer = sequelize.define(
         },
       },
     },
-    location: {
-      type: DataTypes.STRING(255),
+    role: {
+      type: DataTypes.ENUM("farmer", "customer"),
       allowNull: false,
-    },
-    state: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    latitude: {
-      type: DataTypes.DECIMAL(9, 6),
-    },
-    longitude: {
-      type: DataTypes.DECIMAL(9, 6),
     },
   },
   {
-    tableName: "farmers",
+    tableName: "Users",
     timestamps: false,
     defaultScope: {
       attributes: { exclude: ["password"] },
@@ -96,4 +76,4 @@ const Farmer = sequelize.define(
   }
 );
 
-export default Farmer;
+export default User;

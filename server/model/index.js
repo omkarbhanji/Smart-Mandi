@@ -1,13 +1,21 @@
-import Farmer from "./Farmer.js";
-import Inventory from "./Inventory.js";
-import Market from "./Market.js";
+import User from "./User.js";
 import Sale from "./Sale.js";
+import Market from "./Market.js";
+import Inventory from "./Inventory.js";
+import FarmerProfile from "./FarmerProfile.js";
+import CustomerProfile from "./CustomerProfile.js";
 
-Farmer.hasMany(Inventory, {
+User.hasOne(FarmerProfile, { foreignKey: "userId", as: "farmerProfile" });
+FarmerProfile.belongsTo(User, { foreignKey: "userId" });
+
+User.hasOne(CustomerProfile, { foreignKey: "userId", as: "customerProfile" });
+CustomerProfile.belongsTo(User, { foreignKey: "userId" });
+
+FarmerProfile.hasMany(Inventory, {
   foreignKey: "farmerId",
   onDelete: "CASCADE",
 });
-Inventory.belongsTo(Farmer, {
+Inventory.belongsTo(FarmerProfile, {
   foreignKey: "farmerId",
   onDelete: "CASCADE",
 });
@@ -21,4 +29,4 @@ Sale.belongsTo(Inventory, {
   onDelete: "CASCADE",
 });
 
-export { Farmer, Inventory, Market, Sale };
+export { User, FarmerProfile, CustomerProfile, Inventory, Market, Sale };

@@ -7,7 +7,7 @@ const signToken = (id) => {
 };
 
 export const sendToken = (user, statusCode, res) => {
-  const token = signToken(user.farmerId);
+  const token = signToken(user.userId);
 
   const option = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),

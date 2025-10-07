@@ -1,57 +1,71 @@
 import { Inventory } from "../model/index.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { AppError } from "../utils/appError.js";
+import { Op } from "sequelize";
 
 export const addNewCrop = asyncHandler(async (req, res, next) => {
-  const { farmerId, cropName, quantity, unit, harvestDate } = req.body;
+  const { cropName, quantity, unit, status } = req.body;
 
-  const vegetableShelfLife = {
-    tomatoes: 7,
-    onions: 28,
-    potatoes: 28,
-  };
+  // const vegetableShelfLife = {
+  //   tomatoes: 7,
+  //   onions: 28,
+  //   potatoes: 28,
+  // };
 
-  const remainingQuantity = quantity;
-  const status = "available";
+  // const remainingQuantity = quantity;
+  // const status = "available";
 
-  let expiryDate = null;
-  console.log(cropName);
-  if (vegetableShelfLife[cropName.toLowerCase()]) {
-    const harvestDateObj = new Date(harvestDate);
-    harvestDateObj.setDate(
-      harvestDateObj.getDate() + vegetableShelfLife[cropName.toLowerCase()]
-    );
-    expiryDate = harvestDateObj;
-  }
+  // let expiryDate = null;
+  // console.log(cropName);
+  // if (vegetableShelfLife[cropName.toLowerCase()]) {
+  //   const harvestDateObj = new Date(harvestDate);
+  //   harvestDateObj.setDate(
+  //     harvestDateObj.getDate() + vegetableShelfLife[cropName.toLowerCase()]
+  //   );
+  //   expiryDate = harvestDateObj;
+  // }
 
-  // Insert record using Sequelize
-  await Inventory.create({
-    farmerId,
+  // // Insert record using Sequelize
+  // await Inventory.create({
+  //   farmerId,
+  //   cropName,
+  //   quantity,
+  //   unit,
+  //   harvestDate,
+  //   expiryDate,
+  //   remainingQuantity,
+  //   status,
+  // });
+
+  const data = await Inventory.create({
+    farmerId: req.user.farmerProfile.farmerId,
     cropName,
     quantity,
     unit,
-    harvestDate,
-    expiryDate,
-    remainingQuantity,
     status,
   });
 
   res.status(201).json({
     status: "success",
-    message: "Record added in inventory successfully",
+    data: {
+      data,
+    },
   });
 });
 
 export const getAllInventory = asyncHandler(async (req, res, next) => {
-  const { farmerId } = req.body;
+  const farmerId = req.user.farmerProfile.farmerId;
 
-  const inventories = await Inventory.findAll({
+  const data = await Inventory.findAll({
     where: { farmerId },
   });
 
   res.status(200).json({
     status: "success",
-    inventories,
+    total: data.length,
+    data: {
+      data,
+    },
   });
 });
 
@@ -61,12 +75,43 @@ export const getById = asyncHandler(async (req, res, next) => {
   const inventory = await Inventory.findByPk(inventoryId);
 
   if (!inventory) {
-    return next(new AppError("Inventory not found", 404));
+    return next(new AppError("No inventory found with this id", 404));
   }
 
   res.status(200).json({
     status: "success",
-    inventory,
+    data: {
+      inventory,
+    },
+  });
+});
+
+export const updateStatus = asyncHandler(async (req, res, next) => {
+  const { status } = req.body;
+  const { inventoryId } = req.params;
+
+  const inv = await Inventory.findByPk(inventoryId);
+
+  if (!inv) {
+    return next(new AppError("Inventory not found with this id", 404));
+  }
+
+  if (!status) {
+    return next(new AppError("Please enter status", 400));
+  }
+
+  if (inv.farmerId !== req.user.farmerProfile.farmerId) {
+    return next(new AppError("You can't delete this inventory", 403));
+  }
+
+  inv.status = status;
+  await inv.save();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      inventory: inv,
+    },
   });
 });
 
@@ -76,14 +121,52 @@ export const deleteItemFromInventory = asyncHandler(async (req, res, next) => {
   const inventory = await Inventory.findByPk(inventoryId);
 
   if (!inventory) {
-    return next(new AppError("Item not found in inventory", 404));
+    return next(new AppError("No inventory found with this id", 404));
+  }
+
+  if (inventory.farmerId !== req.user.farmerProfile.farmerId) {
+    return next(new AppError("You can't delete this inventory", 403));
   }
 
   await inventory.destroy();
 
   return res.status(204).json({
     status: "success",
-    message: "Item deleted from inventory successfully",
     data: null,
+  });
+});
+
+export const itemForSell = asyncHandler(async (req, res, next) => {
+  const { minQuantity, maxQuantity, cropName } = req.query;
+
+  const whereCondition = { status: "available" };
+
+  if (minQuantity) {
+    whereCondition.quantity = {
+      ...(whereCondition.quantity || {}),
+      [Op.gte]: Number(minQuantity),
+    };
+  }
+
+  if (maxQuantity) {
+    whereCondition.quantity = {
+      ...(whereCondition.quantity || {}),
+      [Op.lte]: Number(maxQuantity),
+    };
+  }
+
+  if (cropName) {
+    whereCondition.cropName = { [Op.iLike]: `%${cropName}%` };
+  }
+
+  const data = await Inventory.findAll({
+    where: whereCondition,
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      data,
+    },
   });
 });

@@ -1,10 +1,17 @@
 import jwt from "jsonwebtoken";
-import { Farmer } from "../model/index.js";
+import { CustomerProfile, FarmerProfile, User } from "../model/index.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { AppError } from "../utils/appError.js";
 
 export const protect = asyncHandler(async (req, res, next) => {
-  const { jwtToken } = req.cookies;
+  // const { jwtToken } = req.cookies;
+  let jwtToken;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    jwtToken = req.headers.authorization.split(" ")[1];
+  }
 
   if (!jwtToken) {
     return next(
@@ -14,7 +21,12 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   const decode = jwt.verify(jwtToken, process.env.JWT_SECRET_KEY);
 
-  const user = await Farmer.findByPk(decode.id);
+  const user = await User.findByPk(decode.id, {
+    include: [
+      { model: FarmerProfile, as: "farmerProfile", required: false },
+      { model: CustomerProfile, as: "customerProfile", required: false },
+    ],
+  });
 
   if (!user) {
     return next(
@@ -26,6 +38,15 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+export const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("You do not have permission for this", 403));
+    }
+    next();
+  };
+};
 
 export const authUser = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];

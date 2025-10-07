@@ -20,6 +20,14 @@ app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/market", marketRoutes);
 
+app.get("/ping", (req, res) => {
+  console.log("req come");
+  res.status(200).json({
+    status: "success",
+    message: "Pong , server up and running!!",
+  });
+});
+
 app.use(errorHandler);
 
 export default app;
