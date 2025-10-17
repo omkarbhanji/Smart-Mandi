@@ -61,7 +61,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 // Login user
 export const loginUser = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   if (!email.trim() || !password.trim()) {
     return next(new AppError("Please enter email and password", 400));
@@ -80,6 +80,10 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
   if (!isPasswordCorrect) {
+    return next(new AppError("Incorrect email or password", 401));
+  }
+
+  if (user.role !== role) {
     return next(new AppError("Incorrect email or password", 401));
   }
 

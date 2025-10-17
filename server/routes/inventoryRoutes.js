@@ -20,7 +20,12 @@ router.delete(
   restrictTo("farmer"),
   deleteItemFromInventory
 );
-router.patch("/:inventoryId", protect, restrictTo("farmer"), updateStatus);
+router.patch(
+  "/updateStatus/:inventoryId",
+  protect,
+  restrictTo("farmer"),
+  updateStatus
+);
 router.get("/forSell", protect, itemForSell);
 
 //sales routes

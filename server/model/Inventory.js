@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
-import FarmerProfile from "./FarmerProfile.js";
+import User from "./User.js";
 
 const Inventory = sequelize.define(
   "Inventory",
@@ -15,8 +15,8 @@ const Inventory = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: FarmerProfile,
-        key: "farmerId",
+        model: User,
+        key: "userId",
       },
     },
     cropName: {
@@ -30,6 +30,11 @@ const Inventory = sequelize.define(
     unit: {
       type: DataTypes.STRING(20),
       defaultValue: "kg",
+    },
+    price: {
+      // pre unit
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM("available", "sold", "stock"),

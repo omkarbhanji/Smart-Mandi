@@ -7,6 +7,8 @@ const sendError = (error, res) => {
       message: error.message,
     });
   } else {
+    // console.log(error);
+
     console.log(error.name);
     console.log("Error : " + error);
     res.status(500).json({
@@ -29,6 +31,13 @@ const handleSequelizeUniqueConstraintError = (err) => {
   return new AppError(message, 400);
 };
 
+const handleTokenExpiredError = (err) => {
+  return new AppError(
+    "Your session has expired. Please log in again to continue.",
+    401
+  );
+};
+
 export const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
@@ -43,5 +52,8 @@ export const errorHandler = (err, req, res, next) => {
     error = handleSequelizeUniqueConstraintError(error);
   }
 
+  if (error.name === "TokenExpiredError") {
+    error = handleTokenExpiredError(error);
+  }
   sendError(error, res);
 };

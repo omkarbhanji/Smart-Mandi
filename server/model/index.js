@@ -4,22 +4,27 @@ import Market from "./Market.js";
 import Inventory from "./Inventory.js";
 import FarmerProfile from "./FarmerProfile.js";
 import CustomerProfile from "./CustomerProfile.js";
+import BuyRequest from "./buyRequest.js";
 
+// User ↔ FarmerProfile (One-to-One)
 User.hasOne(FarmerProfile, { foreignKey: "userId", as: "farmerProfile" });
 FarmerProfile.belongsTo(User, { foreignKey: "userId" });
 
+// User ↔ CustomerProfile (One-to-One)
 User.hasOne(CustomerProfile, { foreignKey: "userId", as: "customerProfile" });
 CustomerProfile.belongsTo(User, { foreignKey: "userId" });
 
-FarmerProfile.hasMany(Inventory, {
-  foreignKey: "farmerId",
+// FarmerProfile ↔ Inventory (One-to-Many)
+User.hasMany(Inventory, {
+  foreignKey: "userId",
   onDelete: "CASCADE",
 });
-Inventory.belongsTo(FarmerProfile, {
-  foreignKey: "farmerId",
+Inventory.belongsTo(User, {
+  foreignKey: "userId",
   onDelete: "CASCADE",
 });
 
+// Inventory ↔ Sale (One-to-Many)
 Inventory.hasMany(Sale, {
   foreignKey: "inventoryId",
   onDelete: "CASCADE",
@@ -29,4 +34,41 @@ Sale.belongsTo(Inventory, {
   onDelete: "CASCADE",
 });
 
-export { User, FarmerProfile, CustomerProfile, Inventory, Market, Sale };
+// User ↔ BuyRequest (Customer & Farmer roles)
+User.hasMany(BuyRequest, {
+  foreignKey: "customerId",
+  as: "customerRequests",
+  onDelete: "CASCADE",
+});
+User.hasMany(BuyRequest, {
+  foreignKey: "farmerId",
+  as: "farmerRequests",
+  onDelete: "CASCADE",
+});
+
+// BuyRequest ↔ User (both sides)
+BuyRequest.belongsTo(User, {
+  foreignKey: "customerId",
+  as: "customer",
+});
+BuyRequest.belongsTo(User, {
+  foreignKey: "farmerId",
+  as: "farmer",
+});
+
+// Inventory ↔ BuyRequest (One-to-Many)
+Inventory.hasMany(BuyRequest, {
+  foreignKey: "inventoryId",
+  onDelete: "CASCADE",
+});
+BuyRequest.belongsTo(Inventory, { foreignKey: "inventoryId", as: "inventory" });
+
+export {
+  User,
+  FarmerProfile,
+  CustomerProfile,
+  Inventory,
+  Market,
+  Sale,
+  BuyRequest,
+};

@@ -4,7 +4,7 @@ import { AppError } from "../utils/appError.js";
 import { Op } from "sequelize";
 
 export const addNewCrop = asyncHandler(async (req, res, next) => {
-  const { cropName, quantity, unit, status } = req.body;
+  const { cropName, quantity, unit, price, status } = req.body;
 
   // const vegetableShelfLife = {
   //   tomatoes: 7,
@@ -38,10 +38,11 @@ export const addNewCrop = asyncHandler(async (req, res, next) => {
   // });
 
   const data = await Inventory.create({
-    farmerId: req.user.farmerProfile.farmerId,
+    farmerId: req.user.userId,
     cropName,
     quantity,
     unit,
+    price,
     status,
   });
 
