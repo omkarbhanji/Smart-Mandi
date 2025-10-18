@@ -1,16 +1,65 @@
-// 📄 lib/widgets/inventory_card.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend_customer/services/auth_service.dart';
 import 'package:frontend_customer/theme.dart';
+import 'package:frontend_customer/widgets/detail_row_text.dart';
+import 'package:http/http.dart' as http;
+import 'package:frontend_customer/services/capitalize_text.dart';
 
-class InventoryCard extends StatelessWidget {
+class InventoryCard extends StatefulWidget {
   const InventoryCard({
     super.key,
     required this.item,
-    required this.onManage,
   });
 
   final Map<String, dynamic> item;
-  final VoidCallback onManage;
+
+  @override
+  State<InventoryCard> createState() => _InventoryCardState();
+}
+
+class _InventoryCardState extends State<InventoryCard> {
+  void _sendBuyRequest(int inventoryId) async {
+    final token = await getToken();
+
+    final url = Uri.parse("${dotenv.env['BACKEND_URL']}/api/buyRequest/");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"inventoryId": inventoryId}),
+      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Request sent successfully'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      } else {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data['message']),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Something went wrong. $e'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +72,17 @@ class InventoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
           border: const Border(
-              left: BorderSide(color: AppColors.secondary, width: 6)),
+            left: BorderSide(color: AppColors.secondary, width: 6),
+          ),
           color: Colors.white,
         ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 🟩 Crop Name
             Text(
-              item['cropName'][0].toString().toUpperCase() +
-                  item['cropName'].toString().substring(1),
+              capitalize(widget.item['cropName']),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -40,34 +90,71 @@ class InventoryCard extends StatelessWidget {
               ),
             ),
             const Divider(height: 15, thickness: 1),
-            _buildDetailRow(
-                Icons.scale_outlined,
-                'Quantity: ${item['quantity']} ${item['unit']}',
-                AppColors.primary),
-            _buildDetailRow(
-                Icons.currency_rupee,
-                'Price: ₹${item['price']} per ${item['unit']}',
-                AppColors.primary),
-            _buildDetailRow(
-                Icons.location_pin, 'Location: <location>', AppColors.primary),
-            _buildDetailRow(Icons.location_pin, 'Status: ${item['status']}',
-                AppColors.primary),
-            const SizedBox(height: 10),
+
+            // 🟩 Info rows (two-column layout)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left column: Quantity, Price
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.item['farmer']?['name'] != null)
+                        DetailRowText(
+                          icon: Icons.person_outline,
+                          text: capitalize(widget.item['farmer']['name']),
+                          color: AppColors.primary,
+                        ),
+                      DetailRowText(
+                        icon: Icons.scale_outlined,
+                        text:
+                            'Quantity: ${widget.item['quantity']} ${widget.item['unit']}',
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Right column: Location, Farmer, Status
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.item['farmer']?['farmerProfile'] != null)
+                        DetailRowText(
+                          icon: Icons.location_on_outlined,
+                          text:
+                              '${capitalize(widget.item['farmer']['farmerProfile']['location'])}, ${capitalize(widget.item['farmer']['farmerProfile']['state'])}',
+                          color: AppColors.primary,
+                        ),
+                      DetailRowText(
+                        icon: Icons.currency_rupee,
+                        text:
+                            '₹${widget.item['price']} per ${widget.item['unit']}',
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      _sendBuyRequest(widget.item['inventoryId']);
+                    },
+                    child: const Text("I'm interested")),
+              ],
+            )
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String text, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: color.withOpacity(0.7)),
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_customer/screens/login.dart';
 import 'package:frontend_customer/screens/market.dart';
+import 'package:frontend_customer/screens/my_requests.dart';
 import 'package:frontend_customer/services/auth_service.dart';
 import 'package:frontend_customer/theme.dart';
 import 'package:frontend_customer/widgets/action_button.dart';
@@ -64,36 +65,36 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Smart Mandi'),
-        actions: [
-          // 🔔 Notification icon
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('You have 0 new inquiries!')),
-                  );
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 12,
-                    minHeight: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+        // actions: [
+        //   // 🔔 Notification icon
+        //   Stack(
+        //     children: [
+        //       IconButton(
+        //         icon: const Icon(Icons.notifications),
+        //         onPressed: () {
+        //           ScaffoldMessenger.of(context).showSnackBar(
+        //             const SnackBar(content: Text('You have 0 new inquiries!')),
+        //           );
+        //         },
+        //       ),
+        //       Positioned(
+        //         right: 8,
+        //         top: 8,
+        //         child: Container(
+        //           padding: const EdgeInsets.all(2),
+        //           decoration: BoxDecoration(
+        //             color: Colors.red,
+        //             borderRadius: BorderRadius.circular(6),
+        //           ),
+        //           constraints: const BoxConstraints(
+        //             minWidth: 12,
+        //             minHeight: 12,
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ],
       ),
       drawer: SideDrawer(
         customerName: "Customer", // or fetch dynamically
@@ -144,7 +145,7 @@ class _HomeState extends State<Home> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
-              childAspectRatio: 1.2,
+              childAspectRatio: 2.0,
               children: [
                 ActionButton(
                   icon: Icons.shopping_bag,
@@ -155,6 +156,19 @@ class _HomeState extends State<Home> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const Market(),
+                      ),
+                    );
+                  },
+                ),
+                ActionButton(
+                  icon: Icons.forum,
+                  title: 'My Requests',
+                  color: AppColors.secondary,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyRequests(),
                       ),
                     );
                   },

@@ -146,7 +146,6 @@ class _MarketState extends State<Market> {
                                   padding: const EdgeInsets.only(bottom: 16.0),
                                   child: InventoryCard(
                                     item: item,
-                                    onManage: () {},
                                   ),
                                 );
                               },

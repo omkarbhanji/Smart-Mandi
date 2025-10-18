@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/add_crop.dart';
+import 'package:frontend/screens/buy_requests.dart';
 import 'package:frontend/screens/inventory.dart';
 import 'package:frontend/screens/login.dart';
 import 'package:frontend/screens/predict_price.dart';
@@ -74,8 +75,14 @@ class _HomeState extends State<Home> {
               IconButton(
                 icon: const Icon(Icons.notifications),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('You have 0 new inquiries!')),
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   const SnackBar(content: Text('You have 0 new inquiries!')),
+                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BuyRequests(),
+                    ),
                   );
                 },
               ),

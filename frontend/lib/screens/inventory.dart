@@ -41,7 +41,9 @@ class _InventoryState extends State<Inventory> {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         },
-        body: jsonEncode({"status": status}),
+        body: jsonEncode(
+          {"status": status},
+        ),
       );
 
       if (response.statusCode == 200) {

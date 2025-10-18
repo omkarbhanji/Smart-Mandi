@@ -19,12 +19,14 @@ class _PredictPriceState extends State<PredictPrice> {
   bool _isLoading = false;
 
   final List<String> _units = ['kg', 'quintal', 'ton'];
+  // ignore: unused_field
   final List<String> _statuses = ['available', 'sold', 'stock'];
 
   Future<void> _onSubmit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      // ignore: unused_local_variable
       final cropData = {
         'cropName': _cropName,
         'quantity': _quantity,
