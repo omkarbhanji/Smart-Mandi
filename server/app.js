@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
+import buyRequestRouter from "./routes/buyRequestRoutes.js";
 import marketRoutes from "./routes/marketRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/buyRequest", buyRequestRouter);
 app.use("/api/market", marketRoutes);
 
 app.get("/ping", (req, res) => {

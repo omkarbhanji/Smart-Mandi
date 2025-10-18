@@ -1,4 +1,4 @@
-import { Inventory } from "../model/index.js";
+import { FarmerProfile, Inventory, User } from "../model/index.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { AppError } from "../utils/appError.js";
 import { Op } from "sequelize";
@@ -162,6 +162,20 @@ export const itemForSell = asyncHandler(async (req, res, next) => {
 
   const data = await Inventory.findAll({
     where: whereCondition,
+    include: [
+      {
+        model: User,
+        as: "farmer",
+        attributes: ["userId", "name"],
+        include: [
+          {
+            model: FarmerProfile,
+            as: "farmerProfile",
+            attributes: ["location", "state"],
+          },
+        ],
+      },
+    ],
   });
 
   res.status(200).json({

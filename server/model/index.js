@@ -16,11 +16,12 @@ CustomerProfile.belongsTo(User, { foreignKey: "userId" });
 
 // FarmerProfile ↔ Inventory (One-to-Many)
 User.hasMany(Inventory, {
-  foreignKey: "userId",
+  foreignKey: "farmerId",
   onDelete: "CASCADE",
 });
 Inventory.belongsTo(User, {
-  foreignKey: "userId",
+  foreignKey: "farmerId",
+  as: "farmer",
   onDelete: "CASCADE",
 });
 
