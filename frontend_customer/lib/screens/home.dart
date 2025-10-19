@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend_customer/screens/login.dart';
 import 'package:frontend_customer/screens/market.dart';
 import 'package:frontend_customer/screens/my_requests.dart';
+import 'package:frontend_customer/screens/notification_page.dart';
 import 'package:frontend_customer/services/auth_service.dart';
 import 'package:frontend_customer/theme.dart';
 import 'package:frontend_customer/widgets/action_button.dart';
 import 'package:frontend_customer/widgets/side_drawer.dart';
+import "package:http/http.dart" as http;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,12 +21,42 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentPage = 0;
+  List<Map<String, dynamic>> _notifications = [];
+  String _notificationCnt = '0';
 
   final List<String> sliderImages = [
     'https://placehold.co/600x250/059669/FFFFFF?text=Field+Harvest',
     'https://placehold.co/600x250/10B981/FFFFFF?text=Market+Trends',
     'https://placehold.co/600x250/047857/FFFFFF?text=Quality+Produce',
   ];
+
+  Future<void> _getNotifications() async {
+    final url = Uri.parse(
+        "${dotenv.env["BACKEND_URL"]}/api/buyRequest/getCustomerNotifications");
+    final token = await getToken();
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        List<dynamic> data = decoded['data']['unseenRequests'];
+        print(decoded);
+        setState(() {
+          _notificationCnt = decoded['total'].toString();
+          _notifications = List<Map<String, dynamic>>.from(data);
+        });
+      }
+    } catch (e) {
+      print("❌ Error $e");
+    }
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -59,42 +94,59 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _getNotifications();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const customerName = 'Customer';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Smart Mandi'),
-        // actions: [
-        //   // 🔔 Notification icon
-        //   Stack(
-        //     children: [
-        //       IconButton(
-        //         icon: const Icon(Icons.notifications),
-        //         onPressed: () {
-        //           ScaffoldMessenger.of(context).showSnackBar(
-        //             const SnackBar(content: Text('You have 0 new inquiries!')),
-        //           );
-        //         },
-        //       ),
-        //       Positioned(
-        //         right: 8,
-        //         top: 8,
-        //         child: Container(
-        //           padding: const EdgeInsets.all(2),
-        //           decoration: BoxDecoration(
-        //             color: Colors.red,
-        //             borderRadius: BorderRadius.circular(6),
-        //           ),
-        //           constraints: const BoxConstraints(
-        //             minWidth: 12,
-        //             minHeight: 12,
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ],
+        actions: [
+          // 🔔 Notification icon
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          NotificationPage(notifications: _notifications),
+                    ),
+                  ).then(
+                    (_) {
+                      _getNotifications();
+                    },
+                  );
+                },
+              ),
+              if (int.tryParse(_notificationCnt) != null &&
+                  int.tryParse(_notificationCnt)! > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 12,
+                      minHeight: 12,
+                    ),
+                    child: Text(_notificationCnt),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
       drawer: SideDrawer(
         customerName: "Customer", // or fetch dynamically
@@ -157,6 +209,10 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(
                         builder: (context) => const Market(),
                       ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),
@@ -170,6 +226,10 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(
                         builder: (context) => const MyRequests(),
                       ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),

@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/screens/add_crop.dart';
 import 'package:frontend/screens/buy_requests.dart';
 import 'package:frontend/screens/inventory.dart';
 import 'package:frontend/screens/login.dart';
+import 'package:frontend/screens/notification_page.dart';
 import 'package:frontend/screens/predict_price.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/theme.dart';
 import 'package:frontend/widgets/action_button.dart';
@@ -19,12 +23,38 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentPage = 0;
+  String _notificationCnt = '0';
+  List<Map<String, dynamic>> _notifications = [];
 
   final List<String> sliderImages = [
     'https://placehold.co/600x250/059669/FFFFFF?text=Field+Harvest',
     'https://placehold.co/600x250/10B981/FFFFFF?text=Market+Trends',
     'https://placehold.co/600x250/047857/FFFFFF?text=Quality+Produce',
   ];
+
+  Future<void> _getNotifications() async {
+    final url = Uri.parse(
+        "${dotenv.env['BACKEND_URL']}/api/buyRequest/getFarmerNotifications");
+    final token = await getToken();
+
+    try {
+      final response = await http.get(url, headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final List<dynamic> data = decoded['data']['unseenRequests'];
+        setState(() {
+          _notificationCnt = decoded['total'].toString();
+          _notifications = List<Map<String, dynamic>>.from(data);
+        });
+      }
+    } catch (e) {
+      print("❌ Error $e");
+    }
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -62,6 +92,12 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _getNotifications();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const farmerName = 'Farmer';
 
@@ -75,32 +111,38 @@ class _HomeState extends State<Home> {
               IconButton(
                 icon: const Icon(Icons.notifications),
                 onPressed: () {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   const SnackBar(content: Text('You have 0 new inquiries!')),
-                  // );
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const BuyRequests(),
+                      builder: (context) => NotificationPage(
+                        notifications: _notifications,
+                      ),
                     ),
+                  ).then(
+                    (_) {
+                      _getNotifications();
+                    },
                   );
                 },
               ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 12,
-                    minHeight: 12,
+              if (int.tryParse(_notificationCnt) != null &&
+                  int.tryParse(_notificationCnt)! > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 12,
+                      minHeight: 12,
+                    ),
+                    child: Text(_notificationCnt),
                   ),
                 ),
-              ),
             ],
           ),
         ],
@@ -166,6 +208,10 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(
                         builder: (context) => const AddCrop(),
                       ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),
@@ -179,6 +225,10 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(
                         builder: (context) => const Inventory(),
                       ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),
@@ -192,6 +242,10 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(
                         builder: (context) => const PredictPrice(),
                       ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),
@@ -203,6 +257,25 @@ class _HomeState extends State<Home> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text('This feature is coming soon!')),
+                    );
+                    // call in Future
+                    // _getNotifications();
+                  },
+                ),
+                ActionButton(
+                  icon: Icons.list_alt,
+                  title: 'Buy Requests',
+                  color: Colors.blueGrey,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BuyRequests(),
+                      ),
+                    ).then(
+                      (_) {
+                        _getNotifications();
+                      },
                     );
                   },
                 ),

@@ -62,7 +62,7 @@ class RequestCard extends StatelessWidget {
                     Expanded(
                       child: DetailRowText(
                         icon: Icons.date_range,
-                        text: '${formatDate(request['createdAt'])}',
+                        text: formatDate(request['createdAt']),
                         color: AppColors.primary,
                       ),
                     )
@@ -79,11 +79,6 @@ class RequestCard extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Status
-            Text(
-              "Status: ${capitalize(request['status'])}",
-              style: TextStyle(fontWeight: FontWeight.bold, color: statusColor),
-            ),
-            const SizedBox(height: 8),
 
             // Farmer Contact (only if accepted)
             if (request['status'] == 'accepted' && farmer != null)
@@ -98,23 +93,41 @@ class RequestCard extends StatelessWidget {
                         color: Colors.blueGrey[700]),
                   ),
                   const SizedBox(height: 4),
-                  if (farmer['name'] != null)
-                    DetailRowText(
-                        icon: Icons.person,
-                        text: capitalize(farmer['name']),
-                        color: AppColors.primary),
-                  if (farmer['phone'] != null)
-                    DetailRowText(
-                        icon: Icons.phone,
-                        text: farmer['phone'],
-                        color: AppColors.primary),
+                  Row(
+                    children: [
+                      if (farmer['name'] != null)
+                        Expanded(
+                          child: DetailRowText(
+                              icon: Icons.person,
+                              text: capitalize(farmer['name']),
+                              color: AppColors.primary),
+                        ),
+                      if (farmer['phone'] != null)
+                        Expanded(
+                          child: DetailRowText(
+                              icon: Icons.phone,
+                              text: farmer['phone'],
+                              color: AppColors.primary),
+                        ),
+                    ],
+                  ),
                   if (farmer['email'] != null)
                     DetailRowText(
                         icon: Icons.email,
                         text: farmer['email'],
                         color: AppColors.primary),
+                  DetailRowText(
+                      icon: Icons.location_on,
+                      text:
+                          "${farmer['farmerProfile']['location']}, ${farmer['farmerProfile']['state']} ",
+                      color: AppColors.primary),
                 ],
               ),
+            const SizedBox(height: 8),
+            Text(
+              "Status: ${capitalize(request['status'])}",
+              style: TextStyle(fontWeight: FontWeight.bold, color: statusColor),
+            ),
           ],
         ),
       ),

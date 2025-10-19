@@ -80,6 +80,7 @@ class _BuyRequestsPageState extends State<BuyRequests> {
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
+
         final List<dynamic> data = decoded['data']['data'] ?? [];
 
         setState(() {
