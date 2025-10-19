@@ -4,6 +4,9 @@ import {
   acceptOrRejectRequest,
   getBuyRequestsCustomer,
   getBuyRequestsFarmer,
+  getCustomerNotifications,
+  getFarmerNotifications,
+  markAsSeen,
   sendBuyRequest,
 } from "../controllers/buyRequestController.js";
 
@@ -24,11 +27,32 @@ router.get(
   getBuyRequestsCustomer
 );
 
+router.get(
+  "/getCustomerNotifications",
+  protect,
+  restrictTo("customer"),
+  getCustomerNotifications
+);
+
+router.get(
+  "/getFarmerNotifications",
+  protect,
+  restrictTo("farmer"),
+  getFarmerNotifications
+);
+
 router.patch(
   "/updateStatus/:buyRequestId",
   protect,
   restrictTo("farmer"),
   acceptOrRejectRequest
+);
+
+router.patch(
+  "/markAsSeen/:buyRequestId",
+  protect,
+  restrictTo("farmer", "customer"),
+  markAsSeen
 );
 
 export default router;

@@ -42,6 +42,18 @@ const BuyRequest = sequelize.define(
       allowNull: false,
       defaultValue: "pending",
     },
+
+    seenByCustomer: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: null,
+    },
+
+    seenByFarmer: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    },
   },
   {
     tableName: "BuyRequest",

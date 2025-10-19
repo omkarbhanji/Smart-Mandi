@@ -1,5 +1,11 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
-import { BuyRequest, Inventory, User } from "../model/index.js";
+import {
+  BuyRequest,
+  CustomerProfile,
+  FarmerProfile,
+  Inventory,
+  User,
+} from "../model/index.js";
 import { AppError } from "../utils/appError.js";
 
 // for customer
@@ -53,12 +59,20 @@ export const getBuyRequestsCustomer = asyncHandler(async (req, res, next) => {
         model: User,
         as: "farmer",
         attributes: ["name", "phone", "email"],
+        include: [
+          {
+            model: FarmerProfile,
+            as: "farmerProfile",
+            attributes: ["location", "state"],
+          },
+        ],
         required: false, // allow BuyRequests without a farmer included
         where: {
           "$BuyRequest.status$": "accepted", // include farmer only if BuyRequest.status = accepted
         },
       },
     ],
+    order: [["updatedAt", "DESC"]],
   });
 
   res.status(200).json({
@@ -85,8 +99,16 @@ export const getBuyRequestsFarmer = asyncHandler(async (req, res, next) => {
         model: User,
         as: "customer",
         attributes: ["name", "phone", "email"],
+        include: [
+          {
+            model: CustomerProfile,
+            as: "customerProfile",
+            attributes: ["address"],
+          },
+        ],
       },
     ],
+    order: [["updatedAt", "DESC"]],
   });
 
   res.status(200).json({
@@ -119,12 +141,88 @@ export const acceptOrRejectRequest = asyncHandler(async (req, res, next) => {
   }
 
   buyRequest.status = status;
+  buyRequest.seenByCustomer = false;
   await buyRequest.save();
 
   res.status(200).json({
     status: "success",
     data: {
       buyRequest,
+    },
+  });
+});
+
+export const markAsSeen = asyncHandler(async (req, res, next) => {
+  const { buyRequestId } = req.params;
+  const { userType } = req.body;
+
+  const updateData =
+    userType === "farmer" ? { seenByFarmer: true } : { seenByCustomer: true };
+
+  const data = await BuyRequest.update(updateData, {
+    where: { id: buyRequestId },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      message: "Marked as seen",
+    },
+  });
+});
+
+export const getCustomerNotifications = asyncHandler(async (req, res, next) => {
+  const customerId = req.user.userId;
+
+  const unseenRequests = await BuyRequest.findAll({
+    where: { customerId, seenByCustomer: false },
+    include: [
+      {
+        model: Inventory,
+        as: "inventory",
+        attributes: ["cropName", "price", "quantity", "unit"],
+      },
+      {
+        model: User,
+        as: "farmer",
+        attributes: ["name", "phone", "email"],
+      },
+    ],
+  });
+
+  res.status(200).json({
+    status: "success",
+    total: unseenRequests.length,
+    data: {
+      unseenRequests,
+    },
+  });
+});
+
+export const getFarmerNotifications = asyncHandler(async (req, res, next) => {
+  const farmerId = req.user.userId;
+
+  const unseenRequests = await BuyRequest.findAll({
+    where: { farmerId, seenByFarmer: false },
+    include: [
+      {
+        model: Inventory,
+        as: "inventory",
+        attributes: ["cropName", "price", "quantity", "unit"],
+      },
+      {
+        model: User,
+        as: "customer",
+        attributes: ["name", "phone", "email"],
+      },
+    ],
+  });
+
+  res.status(200).json({
+    status: "success",
+    total: unseenRequests.length,
+    data: {
+      unseenRequests,
     },
   });
 });
