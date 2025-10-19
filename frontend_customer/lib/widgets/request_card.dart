@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_customer/services/capitalize_text.dart';
+import 'package:frontend_customer/services/format_date.dart';
 import 'package:frontend_customer/theme.dart';
 import 'package:frontend_customer/widgets/detail_row_text.dart';
 
@@ -47,11 +48,25 @@ class RequestCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DetailRowText(
-                  icon: Icons.scale_outlined,
-                  text:
-                      '${inventory['quantity']} ${capitalize(inventory['unit'])}',
-                  color: AppColors.primary,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: DetailRowText(
+                        icon: Icons.scale_outlined,
+                        text:
+                            '${inventory['quantity']} ${capitalize(inventory['unit'])}',
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    Expanded(
+                      child: DetailRowText(
+                        icon: Icons.date_range,
+                        text: '${formatDate(request['createdAt'])}',
+                        color: AppColors.primary,
+                      ),
+                    )
+                  ],
                 ),
                 DetailRowText(
                   icon: Icons.currency_rupee,

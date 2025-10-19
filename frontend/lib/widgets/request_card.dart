@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/services/capitalize_text.dart';
+import 'package:frontend/services/format_date.dart';
 import 'package:frontend/theme.dart';
 import 'package:frontend/widgets/detail_row_text.dart';
 
@@ -106,6 +107,10 @@ class RequestCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 8),
+            DetailRowText(
+                icon: Icons.date_range,
+                text: formatDate(request['createdAt']),
+                color: AppColors.primary),
             // Status
             Text(
               "Status: ${capitalize(request['status'])}",
