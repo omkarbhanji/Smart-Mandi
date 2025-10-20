@@ -56,7 +56,12 @@ export const authUser = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // If the token is invalid or expired, it throws an error
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findByPk(decoded.id, {
+      include: [
+        { model: FarmerProfile, as: "farmerProfile", required: false },
+        { model: CustomerProfile, as: "customerProfile", required: false },
+      ],
+    });
 
     return res.status(200).json({
       status: "success",
