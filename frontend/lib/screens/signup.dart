@@ -18,6 +18,7 @@ class _SignupState extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
   bool obsPassword = true;
   String error = '';
+  bool _isLoading = false;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -62,6 +63,10 @@ class _SignupState extends State<Signup> {
 
     final url = Uri.parse("${dotenv.env['BACKEND_URL']}/api/users/register");
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final response = await http.post(
         url,
@@ -73,6 +78,8 @@ class _SignupState extends State<Signup> {
         final data = jsonDecode(response.body);
         final token = data['token'];
         await saveToken(token);
+        UserData.currentUser = data['data']['user'];
+
         print("✅ Sign-up Successful: $data");
         Navigator.pushReplacement(
           context,
@@ -89,6 +96,10 @@ class _SignupState extends State<Signup> {
         error = "Something went wrong. Please check your connection.";
       });
       print("❌ Error: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -225,8 +236,18 @@ class _SignupState extends State<Signup> {
 
                   // 🟢 Sign Up Button
                   ElevatedButton(
-                    onPressed: _signup,
-                    child: const Text("Sign Up"),
+                    onPressed: _isLoading ? null : _signup,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              backgroundColor: AppColors.primary,
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text("Sign Up"),
                   ),
 
                   const SizedBox(height: 16),

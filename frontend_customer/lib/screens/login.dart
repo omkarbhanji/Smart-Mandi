@@ -20,12 +20,17 @@ class _LoginState extends State<Login> {
   String error = '';
   final String role = "customer";
   bool obsPassword = true;
+  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   Future<void> loginUser() async {
     if (!_formKey.currentState!.validate()) return;
 
     final url = Uri.parse("${dotenv.env['BACKEND_URL']}/api/users/login");
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final response = await http.post(
@@ -42,6 +47,7 @@ class _LoginState extends State<Login> {
         final data = jsonDecode(response.body);
         final token = data['token'];
         await saveToken(token);
+        UserData.currentUser = data['data']['user'];
         print("✅ Customer Login Successful: $data");
 
         Navigator.pushAndRemoveUntil(
@@ -60,6 +66,10 @@ class _LoginState extends State<Login> {
         error = "Something went wrong. Please check your connection.";
       });
       print("❌ Error: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -154,10 +164,20 @@ class _LoginState extends State<Login> {
 
                   // 🟢 Login Button
                   ElevatedButton(
-                    onPressed: loginUser,
-                    child: const Text("Login"),
+                    onPressed:
+                        _isLoading ? null : loginUser, // disable when loading
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              backgroundColor: AppColors.primary,
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text("Login"),
                   ),
-
                   const SizedBox(height: 16),
 
                   if (error.isNotEmpty)

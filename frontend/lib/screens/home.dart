@@ -8,6 +8,7 @@ import 'package:frontend/screens/inventory.dart';
 import 'package:frontend/screens/login.dart';
 import 'package:frontend/screens/notification_page.dart';
 import 'package:frontend/screens/predict_price.dart';
+import 'package:frontend/widgets/image_slider.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/theme.dart';
@@ -22,15 +23,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _currentPage = 0;
   String _notificationCnt = '0';
   List<Map<String, dynamic>> _notifications = [];
-
-  final List<String> sliderImages = [
-    'https://placehold.co/600x250/059669/FFFFFF?text=Field+Harvest',
-    'https://placehold.co/600x250/10B981/FFFFFF?text=Market+Trends',
-    'https://placehold.co/600x250/047857/FFFFFF?text=Quality+Produce',
-  ];
 
   Future<void> _getNotifications() async {
     final url = Uri.parse(
@@ -148,8 +142,6 @@ class _HomeState extends State<Home> {
         ],
       ),
       drawer: SideDrawer(
-        farmerName: "Farmer", // or fetch dynamically
-        farmerEmail: "farmer@example.com",
         showLogoutDialog: () => _showLogoutDialog(context),
       ),
       body: SingleChildScrollView(
@@ -174,7 +166,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildImageSlider(),
+            const ImageSlider(),
             const SizedBox(height: 32),
             const Text(
               'Quick Actions',
@@ -284,58 +276,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildImageSlider() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 200,
-          child: PageView.builder(
-            itemCount: sliderImages.length,
-            onPageChanged: (index) {
-              setState(() => _currentPage = index);
-            },
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: Image.network(
-                    sliderImages[index],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: AppColors.secondary.withOpacity(0.2),
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported,
-                            size: 50, color: AppColors.primary),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: sliderImages.asMap().entries.map((entry) {
-            return Container(
-              width: 8.0,
-              height: 8.0,
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == entry.key
-                    ? AppColors.primary
-                    : AppColors.primary.withOpacity(0.3),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 }

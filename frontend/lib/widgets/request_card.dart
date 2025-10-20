@@ -8,9 +8,13 @@ import 'package:frontend/widgets/detail_row_text.dart';
 class RequestCard extends StatelessWidget {
   final Map<String, dynamic> request;
   final Function(int, String) acceptOrReject;
+  final Function(int) updateStatusOnAccept;
 
   const RequestCard(
-      {super.key, required this.request, required this.acceptOrReject});
+      {super.key,
+      required this.request,
+      required this.acceptOrReject,
+      required this.updateStatusOnAccept});
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +136,11 @@ class RequestCard extends StatelessWidget {
                       onPressed: () async {
                         Navigator.pop(context);
                         await acceptOrReject.call(request['id'], 'accepted');
-                        await BuyRequestService.markAsSeen(
-                            buyRequestId: request['id'], context: context);
+                        await updateStatusOnAccept(request['inventoryId']);
+                        if (request['seenByFarmer'] == false) {
+                          await BuyRequestService.markAsSeen(
+                              buyRequestId: request['id'], context: context);
+                        }
                       },
                       child: const Text("Accept"),
                     ),

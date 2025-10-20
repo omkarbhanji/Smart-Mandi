@@ -3,6 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+class UserData {
+  static Map<String, dynamic>? currentUser;
+}
+
 Future<void> saveToken(String token) async {
   print("✅" + token);
   final prefs = await SharedPreferences.getInstance();
@@ -37,6 +41,8 @@ Future<bool> checkLoginStatus() async {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      print("✅ ${data['user']}");
+      UserData.currentUser = data['user'];
       return data['authenticated'] == true;
     } else {
       return false;

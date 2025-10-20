@@ -85,20 +85,55 @@ class _BuyRequestsPageState extends State<BuyRequests> {
 
         setState(() {
           _buyRequests = List<Map<String, dynamic>>.from(data);
-          _isLoading = false;
         });
       } else {
         final data = jsonDecode(response.body);
         setState(() {
           _errorMessage = data['message'];
-          _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Error fetching inventory';
+      });
+    } finally {
+      setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> updateStatusOnAccept(int id) async {
+    final token = await getToken();
+    final url = Uri.parse(
+        "${dotenv.env['BACKEND_URL']}/api/inventory/updateStatus/${id}");
+
+    try {
+      final response = await http.patch(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(
+          {"status": "sold"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Status updated successfully!")),
+        );
+      } else {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
 
@@ -182,6 +217,7 @@ class _BuyRequestsPageState extends State<BuyRequests> {
                                   return RequestCard(
                                     request: displayList[index],
                                     acceptOrReject: acceptOrReject,
+                                    updateStatusOnAccept: updateStatusOnAccept,
                                   );
                                 },
                               ),

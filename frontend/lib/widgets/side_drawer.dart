@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/add_crop.dart';
 import 'package:frontend/screens/inventory.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/theme.dart';
 
 class SideDrawer extends StatelessWidget {
   final Function showLogoutDialog;
-  final String farmerName;
-  final String farmerEmail;
 
   const SideDrawer({
     super.key,
     required this.showLogoutDialog,
-    this.farmerName = "Farmer Name",
-    this.farmerEmail = "farmer@example.com",
   });
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic>? user = UserData.currentUser;
+
+    final String userName = user?['name'] ?? 'username';
+    final String userEmail = user?['email'] ?? 'user@example.com';
+
     return Drawer(
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(farmerName),
-            accountEmail: Text(farmerEmail),
+            accountName: Text(userName),
+            accountEmail: Text(userEmail),
             currentAccountPicture: CircleAvatar(
               backgroundColor: AppColors.accentYellow,
               child: Text(
-                farmerName[0],
+                userName[0],
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

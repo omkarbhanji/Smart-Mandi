@@ -58,17 +58,19 @@ class InventoryCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OutlinedButton.icon(
-                    onPressed: onManage,
-                    icon: const Icon(Icons.edit, size: 18),
-                    label: const Text('Manage'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.secondary),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                  if (item['status'] != 'sold')
+                    OutlinedButton.icon(
+                      onPressed: onManage,
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text('Manage'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.secondary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
-                  ),
                   IconButton(
                     onPressed: onDelete,
                     icon: const Icon(

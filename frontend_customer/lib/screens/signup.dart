@@ -17,6 +17,7 @@ class _SignupState extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
   bool obsPassword = true;
   String error = '';
+  bool _isLoading = false;
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -61,6 +62,10 @@ class _SignupState extends State<Signup> {
 
     final url = Uri.parse("${dotenv.env['BACKEND_URL']}/api/users/register");
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final response = await http.post(
         url,
@@ -72,6 +77,7 @@ class _SignupState extends State<Signup> {
         final data = jsonDecode(response.body);
         final token = data['token'];
         await saveToken(token);
+        UserData.currentUser = data['data']['user'];
         print("✅ Customer Sign-up Successful: $data");
 
         Navigator.pushAndRemoveUntil(
@@ -90,6 +96,10 @@ class _SignupState extends State<Signup> {
         error = "Something went wrong. Please check your connection.";
       });
       print("❌ Error: $e");
+    } finally {
+      setState(() {
+        _isLoading = true;
+      });
     }
   }
 
@@ -227,7 +237,7 @@ class _SignupState extends State<Signup> {
 
                   // 🟢 Sign Up Button
                   ElevatedButton(
-                    onPressed: _signup,
+                    onPressed: _isLoading ? null : _signup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: Colors.white,
@@ -237,7 +247,17 @@ class _SignupState extends State<Signup> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    child: const Text("Sign Up"),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              backgroundColor: AppColors.primary,
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text("Sign Up"),
                   ),
 
                   const SizedBox(height: 16),
