@@ -23,8 +23,7 @@ class _SignupState extends State<Signup> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _stateController = TextEditingController();
+  final _addressController = TextEditingController();
 
   final String _selectedRole = 'customer';
 
@@ -34,8 +33,7 @@ class _SignupState extends State<Signup> {
     _emailController.dispose();
     _passwordController.dispose();
     _phoneController.dispose();
-    _locationController.dispose();
-    _stateController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -54,10 +52,7 @@ class _SignupState extends State<Signup> {
       "password": _passwordController.text.trim(),
       "phone": _phoneController.text.trim(),
       "role": _selectedRole,
-      "location": _locationController.text.trim(),
-      "state": _stateController.text.trim(),
-      "latitude": 18.5204, // example
-      "longitude": 73.8567, // example
+      "address": _addressController.text.trim()
     };
 
     final url = Uri.parse("${dotenv.env['BACKEND_URL']}/api/users/register");
@@ -212,28 +207,17 @@ class _SignupState extends State<Signup> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 📍 Location
+                  // 📍 Address
                   TextFormField(
-                    controller: _locationController,
+                    controller: _addressController,
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.location_city_outlined),
-                      labelText: "City / Location",
-                    ),
-                    validator: (val) => val!.isEmpty ? "Enter your city" : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // 🗺️ State
-                  TextFormField(
-                    controller: _stateController,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.map_outlined),
-                      labelText: "State",
+                      labelText: "Address",
                     ),
                     validator: (val) =>
-                        val!.isEmpty ? "Enter your state" : null,
+                        val!.isEmpty ? "Enter your address" : null,
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 20),
 
                   // 🟢 Sign Up Button
                   ElevatedButton(
