@@ -242,19 +242,6 @@ class _HomeState extends State<Home> {
                   },
                 ),
                 ActionButton(
-                  icon: Icons.settings_suggest,
-                  title: 'New Feature',
-                  color: Colors.blueGrey,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('This feature is coming soon!')),
-                    );
-                    // call in Future
-                    // _getNotifications();
-                  },
-                ),
-                ActionButton(
                   icon: Icons.list_alt,
                   title: 'Buy Requests',
                   color: Colors.blueGrey,
@@ -269,6 +256,19 @@ class _HomeState extends State<Home> {
                         _getNotifications();
                       },
                     );
+                  },
+                ),
+                ActionButton(
+                  icon: Icons.settings_suggest,
+                  title: 'New Feature',
+                  color: Colors.blueGrey,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('This feature is coming soon!')),
+                    );
+                    // call in Future
+                    // _getNotifications();
                   },
                 ),
               ],
