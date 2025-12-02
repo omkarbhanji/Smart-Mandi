@@ -1,3 +1,4 @@
 Agriculture_price_dataset.csv
 server/node_modules/
 *.env
+venv/
