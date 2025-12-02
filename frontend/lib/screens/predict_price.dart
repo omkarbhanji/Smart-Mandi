@@ -19,6 +19,7 @@ class _PredictPriceState extends State<PredictPrice> {
   bool _isLoading = false;
 
   final List<String> _units = ['kg', 'quintal', 'ton'];
+  final List<String> _crops = ['tomato', 'rice', 'wheat', 'potato', 'onion'];
   // ignore: unused_field
   final List<String> _statuses = ['available', 'sold', 'stock'];
 
@@ -76,15 +77,30 @@ class _PredictPriceState extends State<PredictPrice> {
                   const SizedBox(height: 24),
 
                   // Crop Name Input
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Crop Name',
-                      hintText: 'e.g., Wheat, Onion',
-                    ),
-                    onChanged: (value) => _cropName = value,
+                  DropdownButtonFormField<String>(
+                    value: _cropName,
+                    decoration: const InputDecoration(labelText: 'Crop Name'),
+                    items: _crops
+                        .map((crop) => DropdownMenuItem(
+                              value: crop,
+                              child: Text(
+                                  crop[0].toUpperCase() + crop.substring(1)),
+                            ))
+                        .toList(),
+                    onChanged: (value) => setState(() => _cropName = value),
                     validator: (value) =>
-                        value!.isEmpty ? 'Enter crop name' : null,
+                        value == null ? 'Please select a crop name' : null,
                   ),
+
+                  // TextFormField(
+                  //   decoration: const InputDecoration(
+                  //     labelText: 'Crop Name',
+                  //     hintText: 'e.g., Wheat, Onion',
+                  //   ),
+                  //   onChanged: (value) => _cropName = value,
+                  //   validator: (value) =>
+                  //       value!.isEmpty ? 'Enter crop name' : null,
+                  // ),
                   const SizedBox(height: 16),
 
                   // Quantity Input

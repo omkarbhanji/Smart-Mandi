@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Smart Mandi',
       theme: smartMandiTheme,
-      home: const Wrapper(),
+      home: const Home(),
     );
   }
 }
