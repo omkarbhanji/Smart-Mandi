@@ -45,6 +45,16 @@ services:
       - "3001:3001"
     networks:
       - backend-network
+    
+  ml_server:
+    build:
+      context: ../ml_model
+    container_name: ml_server
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - backend-network
 
 volumes:
   postgres_data:
