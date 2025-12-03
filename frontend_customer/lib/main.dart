@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend_customer/screens/home.dart';
 import 'package:frontend_customer/screens/wrapper.dart';
 import 'package:frontend_customer/theme.dart';
 
@@ -17,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Smart Mandi',
       theme: smartMandiTheme,
       home: const Wrapper(),
