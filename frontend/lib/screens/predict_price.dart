@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/theme.dart';
+import 'package:frontend/widgets/predict_price_dialog.dart';
+import 'package:http/http.dart' as http;
 
 class PredictPrice extends StatefulWidget {
   const PredictPrice({super.key});
@@ -12,14 +18,10 @@ class _PredictPriceState extends State<PredictPrice> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _cropName;
-  int? _quantity;
-  String? _unit;
-  double? _pricePerUnit;
-  String? _status;
   bool _isLoading = false;
 
   final List<String> _units = ['kg', 'quintal', 'ton'];
-  final List<String> _crops = ['tomato', 'rice', 'wheat', 'potato', 'onion'];
+  final List<String> _crops = ['rice', 'potato', 'onion', 'cucmber'];
   // ignore: unused_field
   final List<String> _statuses = ['available', 'sold', 'stock'];
 
@@ -27,16 +29,49 @@ class _PredictPriceState extends State<PredictPrice> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // ignore: unused_local_variable
-      final cropData = {
-        'cropName': _cropName,
-        'quantity': _quantity,
-        'unit': _unit,
-        'price': _pricePerUnit,
-        'status': _status,
-      };
+      final url = Uri.parse("${dotenv.env['BACKEND_URL']}/ml/predict_price");
+      final token = await getToken();
 
-      //backend api call here
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final response = await http.post(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          },
+          body: jsonEncode(
+            {"vegetable": _cropName},
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          showPredictPriceDialog(context, data);
+        } else {
+          final data = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message']),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Something went wrong. $e'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -104,46 +139,46 @@ class _PredictPriceState extends State<PredictPrice> {
                   const SizedBox(height: 16),
 
                   // Quantity Input
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Quantity',
-                            hintText: 'e.g., 50',
-                          ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) =>
-                              _quantity = int.tryParse(value.trim()),
-                          validator: (value) => (value == null ||
-                                  int.tryParse(value) == null ||
-                                  int.parse(value) <= 0)
-                              ? 'Enter a valid quantity'
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _unit,
-                          decoration: const InputDecoration(labelText: 'Unit'),
-                          items: _units
-                              .map((unit) => DropdownMenuItem(
-                                    value: unit,
-                                    child: Text(unit[0].toUpperCase() +
-                                        unit.substring(1)),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() => _unit = value),
-                          validator: (value) =>
-                              value == null ? 'Please select a unit' : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: TextFormField(
+                  //         decoration: const InputDecoration(
+                  //           labelText: 'Quantity',
+                  //           hintText: 'e.g., 50',
+                  //         ),
+                  //         keyboardType: TextInputType.number,
+                  //         onChanged: (value) =>
+                  //             _quantity = int.tryParse(value.trim()),
+                  //         validator: (value) => (value == null ||
+                  //                 int.tryParse(value) == null ||
+                  //                 int.parse(value) <= 0)
+                  //             ? 'Enter a valid quantity'
+                  //             : null,
+                  //       ),
+                  //     ),
+                  //     const SizedBox(width: 16),
+                  //     Expanded(
+                  //       child: DropdownButtonFormField<String>(
+                  //         value: _unit,
+                  //         decoration: const InputDecoration(labelText: 'Unit'),
+                  //         items: _units
+                  //             .map((unit) => DropdownMenuItem(
+                  //                   value: unit,
+                  //                   child: Text(unit[0].toUpperCase() +
+                  //                       unit.substring(1)),
+                  //                 ))
+                  //             .toList(),
+                  //         onChanged: (value) => setState(() => _unit = value),
+                  //         validator: (value) =>
+                  //             value == null ? 'Please select a unit' : null,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // const SizedBox(height: 16),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
                   // Submit Button or Loader
                   _isLoading
