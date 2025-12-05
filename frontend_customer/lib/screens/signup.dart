@@ -82,6 +82,8 @@ class _SignupState extends State<Signup> {
         );
       } else {
         final data = jsonDecode(response.body);
+        print("💥💥");
+        print(data);
         setState(() {
           error = data['message'] ?? "Signup failed. Please try again.";
         });

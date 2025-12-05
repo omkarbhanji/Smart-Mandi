@@ -20,8 +20,7 @@ class _PredictPriceState extends State<PredictPrice> {
   String? _cropName;
   bool _isLoading = false;
 
-  final List<String> _units = ['kg', 'quintal', 'ton'];
-  final List<String> _crops = ['rice', 'potato', 'onion', 'cucmber'];
+  final List<String> _crops = ['rice', 'potato', 'onion', 'cucumber'];
   // ignore: unused_field
   final List<String> _statuses = ['available', 'sold', 'stock'];
 
@@ -127,56 +126,7 @@ class _PredictPriceState extends State<PredictPrice> {
                         value == null ? 'Please select a crop name' : null,
                   ),
 
-                  // TextFormField(
-                  //   decoration: const InputDecoration(
-                  //     labelText: 'Crop Name',
-                  //     hintText: 'e.g., Wheat, Onion',
-                  //   ),
-                  //   onChanged: (value) => _cropName = value,
-                  //   validator: (value) =>
-                  //       value!.isEmpty ? 'Enter crop name' : null,
-                  // ),
                   const SizedBox(height: 16),
-
-                  // Quantity Input
-                  // Row(
-                  //   children: [
-                  //     Expanded(
-                  //       child: TextFormField(
-                  //         decoration: const InputDecoration(
-                  //           labelText: 'Quantity',
-                  //           hintText: 'e.g., 50',
-                  //         ),
-                  //         keyboardType: TextInputType.number,
-                  //         onChanged: (value) =>
-                  //             _quantity = int.tryParse(value.trim()),
-                  //         validator: (value) => (value == null ||
-                  //                 int.tryParse(value) == null ||
-                  //                 int.parse(value) <= 0)
-                  //             ? 'Enter a valid quantity'
-                  //             : null,
-                  //       ),
-                  //     ),
-                  //     const SizedBox(width: 16),
-                  //     Expanded(
-                  //       child: DropdownButtonFormField<String>(
-                  //         value: _unit,
-                  //         decoration: const InputDecoration(labelText: 'Unit'),
-                  //         items: _units
-                  //             .map((unit) => DropdownMenuItem(
-                  //                   value: unit,
-                  //                   child: Text(unit[0].toUpperCase() +
-                  //                       unit.substring(1)),
-                  //                 ))
-                  //             .toList(),
-                  //         onChanged: (value) => setState(() => _unit = value),
-                  //         validator: (value) =>
-                  //             value == null ? 'Please select a unit' : null,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 16),
 
                   const SizedBox(height: 28),
 

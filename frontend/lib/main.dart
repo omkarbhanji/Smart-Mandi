@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/screens/home.dart';
 import 'package:frontend/screens/wrapper.dart';
 import 'theme.dart';
 

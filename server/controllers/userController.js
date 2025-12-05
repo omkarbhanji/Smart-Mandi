@@ -10,7 +10,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password, phone, role } = req.body;
 
   const transaction = await sequelize.transaction();
-
+console.log();
   try {
     const user = await User.create(
       {
