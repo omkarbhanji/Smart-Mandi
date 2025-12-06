@@ -1,49 +1,23 @@
-# Smart-Mandi
-This project provides an end to end solution to the farmers for selling their vegetables at their nearest market with absolute ease. Machine learning is used to provide insights to the farmer, helping the farmer make a right choice. Inventory management and time to time notifications before any incurring any loss to the farmer.
+# 🌾 Smart-Mandi – AI-Powered Crop Pricing & Marketplace Platform
+Smart-Mandi provides an end-to-end solution for farmers to sell their crops easily and get the best possible market price using machine learning.
+The platform offers inventory management, price prediction, marketplace listing, and customer–farmer interaction features.
 
+---
 
-Basic structure of the project:
+# 🚀 Features Overview
 
-1. Backend ->
-     a. API EndPt. for getting all the nearest market predicted rates
-     b. Inventory management CRUD opertions
-     c. Live notifications based on avg. rot time for vegetable fetched from internet with buffer to proevent loss. 
+## 👨‍🌾 Farmer Features
+- Use ML model to predict crop price.
+- Add crops to inventory.
+- Manage inventory.
+- Receive buy requests from customers.
+- Accept or reject buy requests.
 
-3. Frontend
-4. ML model -> customized loss function to handle outliners and prediction with confidence level using gaussian/bell curve for probability distribution.
+## 🧑‍💼 Customer Features
+- View all crops listed by all farmers.
+- Send a buy request for any crop.
+- After acceptance by the farmer, customer receives farmer details (phone, location, etc.) for further communication.
 
---------------------------------------------------------------------------------------
-Project Routes:
+---
 
-1. http://localhost:5000/api/inventory - GET (All inventory records for the farmer who has logged in).
-2. http://localhost:5000/api/inventory - POST (Add any new crop to inventory)
-
-3. http://localhost:5000/api/users/register - POST (Register new farmer)
-4. http://localhost:5000/api/users/login - POST (login)
-
-5. http://localhost:5000/api/inventory/:inventory_id/sales - POST (new sales record and update inventory) 
-
---------------------------------------------------------------------------------------
-
-.env file example
-```
-PORT=3001
-
-DATABASE_URL = postgresql://<username>:<password>@localhost:5432/<database-name>
-
-JWT_SECRET_KEY=your_jwt_secret_key
-JWT_EXPIRES_IN=7d
-
-```
---------------------------------------------------------------------------------------
-
-Database schema 
-
-Table name: farmers <br>
-schema: <br>
-farmer_id |     name     |          email           |         password          |     phone      |    location    |    state    |         created_at         |         updated_at         | latitude  | longitude
-
-Table name: inventory <br>
-schema: <br>
-
- inventory_id | farmer_id | crop_name | quantity | unit | harvest_date | expiry_date | remaining_quantity |  status   |         created_at         |         updated_at
+ 
